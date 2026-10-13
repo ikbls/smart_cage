@@ -30,10 +30,21 @@ async function realtime() {
 
             // ================= STATUS =================
 
+            const lastMs = (latest.ts
+                ? latest.ts * 1000
+                : new Date(latest.created_at.replace(" ", "T")).getTime());
+            const nowMs = result.server_time
+                ? result.server_time * 1000
+                : Date.now();
+            const ageMin = (nowMs - lastMs) / 60000;
+            const lastText = new Date(lastMs).toLocaleString('id-ID');
+
+            // Data masuk tiap 2 jam; > 2 jam 30 menit = kemungkinan perangkat belum bisa kirim
             document.getElementById(
                 "status-text"
-            ).innerText =
-            "Realtime Connected";
+            ).innerText = ageMin > 150
+                ? "Menunggu data (terakhir " + lastText + ")"
+                : "Data terakhir: " + lastText;
 
             // ================= TEMPERATURE =================
 
@@ -200,11 +211,13 @@ async function realtime() {
             sensorChart.data.labels =
             reversedData.map(item => {
 
-                return new Date(
-                    item.created_at
-                ).toLocaleTimeString(
-                    'id-ID'
-                );
+                const d = item.ts
+                    ? new Date(item.ts * 1000)
+                    : new Date(item.created_at.replace(" ", "T"));
+                return d.toLocaleString('id-ID', {
+                    day: '2-digit', month: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                });
             });
 
             sensorChart.data.datasets[0].data =
@@ -305,5 +318,5 @@ window.onload = function () {
 
         realtime();
 
-    }, 5000);
+    }, 60000);
 };
