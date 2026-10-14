@@ -17,12 +17,19 @@ function fail($msg, $code = 400) {
 // ================= GET DATA =================
 if ($method === 'GET') {
     try {
-        $stmt = $pdo->query(
-            "SELECT *, EXTRACT(EPOCH FROM created_at)::bigint AS ts
-             FROM sensor_data
-             ORDER BY created_at DESC
-             LIMIT 20"
-        );
+        try {
+            $stmt = $pdo->query(
+                "SELECT *, EXTRACT(EPOCH FROM created_at)::bigint AS ts
+                 FROM sensor_data
+                 ORDER BY created_at DESC
+                 LIMIT 20"
+            );
+        } catch (Exception $e) {
+            // cadangan: query sederhana tanpa kolom ts
+            $stmt = $pdo->query(
+                "SELECT * FROM sensor_data ORDER BY created_at DESC LIMIT 20"
+            );
+        }
         echo json_encode([
             "status"      => "success",
             "server_time" => time(),
