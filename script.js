@@ -235,6 +235,20 @@ async function realtime() {
             );
 
             sensorChart.update();
+
+        } else if (result.status === "success") {
+
+            document.getElementById(
+                "status-text"
+            ).innerText =
+            "Belum ada data di database";
+
+        } else {
+
+            document.getElementById(
+                "status-text"
+            ).innerText =
+            "Error server: " + (result.message || "tidak diketahui");
         }
 
     } catch(error) {
